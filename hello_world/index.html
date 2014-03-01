@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hello World!</title>
+<script>
+
+function createShader(gl, str, type) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, str);
+    gl.compileShader(shader);
+    return shader;
+}
+
+function createProgram(gl, vstr, fstr) {
+    var program = gl.createProgram();
+    var vshader = createShader(gl, vstr, gl.VERTEX_SHADER);
+    var fshader = createShader(gl, fstr, gl.FRAGMENT_SHADER);
+    gl.attachShader(program, vshader);
+    gl.attachShader(program, fshader);
+    gl.linkProgram(program);
+    return program;
+}
+
+function init() {
+    var canvas = document.getElementById('canvas');
+    var gl = canvas.getContext("experimental-webgl");
+    gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+        
+    var vertices = new Float32Array([-0.5, -0.5, 0.5, -0.5, 0, 0.5]);
+
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    var vs = document.getElementById('vshader').textContent;
+    var fs = document.getElementById('fshader').textContent;
+    
+    var program = createProgram(gl, vs,fs);
+    gl.useProgram(program);
+    program.vertexPosAttrib = gl.getAttribLocation(program, 'pos');
+    program.time = gl.getUniformLocation(program, 'time');
+
+    gl.enableVertexAttribArray(program.vertexPosArray);
+    gl.vertexAttribPointer(program.vertexPosAttrib, 2, gl.FLOAT, false, 0, 0);
+
+    run(gl, program);
+}
+
+function run(gl, program) {
+    var time = 0;
+
+    (function draw() {
+        time += .1;
+
+        gl.uniform1f(program.time, time);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        setTimeout(draw, 16);
+    }());
+}
+
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+
+<script id="vshader" type="text/plain">
+attribute vec2 pos;
+varying vec2 vTexCoord;
+void main() { 
+    vTexCoord = pos;
+    gl_Position = vec4(pos, 0, 1);
+}
+</script>
+
+<script id="fshader" type="text/plain">
+precision mediump float;
+varying vec2 vTexCoord;
+uniform float time;
+void main() {
+    gl_FragColor = vec4(vTexCoord.x * cos(time) * sin(time), vTexCoord.y * sin(time), vTexCoord.y * sin(time) + vTexCoord.x * cos(time), 1);
+}
+</script>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+</body>
+</html>
