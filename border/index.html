@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Border</title>
+<script>
+
+function duplicate(context, source) {
+    var destination = context.createImageData(source);
+
+    for(var i = 0; i < source.data.length; i++){
+        destination.data[i] = source.data[i];
+    }
+
+    return destination;
+}
+
+function grayscale(context, source) {
+    var destination = context.createImageData(source);
+
+    for (var i = 0; i < source.data.length; i += 4) {
+        var r = source.data[i];
+        var g = source.data[i + 1];
+        var b = source.data[i + 2];
+
+        var v = 0.3 * r + 0.59 * g + 0.11 * b;
+        destination.data[i] = destination.data[i + 1] = destination.data[i + 2] = v;
+        destination.data[i + 3] = source.data[i + 3];
+    }
+
+    return destination;
+}
+
+function sobel(context, width, height) {
+    var data = context.getImageData(0, 0, width, height);
+    var grayData = grayscale(context, data).data;
+    var destination = duplicate(context, data);
+    var gX = [[-1,0,1], [-2,0,2], [-1,0,1]];
+    var gY = [[-1,-2,-1], [0, 0, 0], [1, 2, 1]];
+
+    for(var i = 1; i < data.width - 2; i++) {
+        for(var j = 1; j < data.height - 2; j++) {
+            var x = (gX[0][0] * grayData[(i - 1) * 4 + (j - 1) * 4 * data.width] + gX[0][1] * grayData[(i) * 4 + (j - 1) * 4 * data.width] + gX[0][2] * grayData[(i + 1) * 4 + (j - 1) * 4 * data.width]) +
+                    (gX[1][0] * grayData[(i - 1) * 4 + (j)     * 4 * data.width] + gX[1][1] * grayData[(i) * 4 + (j)     * 4 * data.width] + gX[1][2] * grayData[(i + 1) * 4 + (j)     * 4 * data.width]) +
+                    (gX[2][0] * grayData[(i - 1) * 4 + (j + 1) * 4 * data.width] + gX[2][1] * grayData[(i) * 4 + (j + 1) * 4 * data.width] + gX[2][2] * grayData[(i + 1) * 4 + (j + 1) * 4 * data.width]);
+
+            var y = (gY[0][0] * grayData[(i - 1) * 4 + (j - 1) * 4 * data.width] + gY[0][1] * grayData[(i) * 4 + (j - 1) * 4 * data.width] + gY[0][2] * grayData[(i + 1) * 4 + (j - 1) * 4 * data.width]) +
+                    (gY[1][0] * grayData[(i - 1) * 4 + (j)     * 4 * data.width] + gY[1][1] * grayData[(i) * 4 + (j)     * 4 * data.width] + gY[1][2] * grayData[(i + 1) * 4 + (j)     * 4 * data.width]) +
+                    (gY[2][0] * grayData[(i - 1) * 4 + (j + 1) * 4 * data.width] + gY[2][1] * grayData[(i) * 4 + (j + 1) * 4 * data.width] + gY[2][2] * grayData[(i + 1) * 4 + (j + 1) * 4 * data.width]);
+
+            var val = Math.ceil(Math.sqrt(x * x + y * y));
+
+            var offset  = j * data.width * 4 + i * 4;
+            destination.data[offset + 0]  = val;
+            destination.data[offset + 1]  = val;
+            destination.data[offset + 2]  = val;
+        }
+    }
+
+    context.putImageData(destination, 0, 0);
+}
+
+function init() {
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext("2d");
+    var image = document.getElementById('sobel');
+
+    image.onload = function() {
+        canvas.width = this.width;
+        canvas.height = this.height;
+        context.drawImage(image, 0, 0, this.width, this.height);
+        sobel(context, this.width, this.height);
+    };
+}
+
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+</head>
+<body>
+<img id="sobel" src="sobel.jpg" style="display:none;" />
+<canvas id="canvas"><canvas>
+</body>
+</html>
