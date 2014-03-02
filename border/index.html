@@ -63,7 +63,7 @@ function sobel(context, width, height) {
 function init() {
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext("2d");
-    var image = document.getElementById('sobel');
+    var image = document.querySelector('img.sobel');
 
     image.onload = function() {
         canvas.width = this.width;
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", init);
 </script>
 </head>
 <body>
-<img id="sobel" src="sobel.jpg" style="display:none;" />
+<img class="sobel" src="sobel.jpg" style="display:none;" />
 <canvas id="canvas"><canvas>
 </body>
 </html>
