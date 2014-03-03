@@ -1,0 +1,26 @@
+body {
+    background-color: black;
+}
+
+.block {
+    width: 64px;
+    height: 64px;
+    margin: 12px;
+    display: inline-block;
+}
+
+.hour {
+    background-color: #2BED48;
+}
+
+.minute {
+    background-color: #DBB440;
+}
+
+.second {
+    background-color: #FFFF47;
+}
+
+.disabled {
+    opacity: .1;
+}
