@@ -10,15 +10,15 @@ body {
 }
 
 .hour {
-    background-color: #2BED48;
+    background-color: #F15A5A;
 }
 
 .minute {
-    background-color: #DBB440;
+    background-color: #2D95BF;
 }
 
 .second {
-    background-color: #FFFF47;
+    background-color: #F0C419;
 }
 
 .disabled {
